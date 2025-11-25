@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Selamat Ulang Tahun 🎂</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@400;600&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+      font-family: 'Poppins', sans-serif;
+      background: radial-gradient(circle at center, #0a0f2c 0%, #050716 100%);
+      color: #fff;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    h1 {
+      font-family: 'Great Vibes', cursive;
+      font-size: 2.5rem;
+      color: #ffd700;
+      text-shadow: 0 0 15px #ffda6b, 0 0 30px #ffae00;
+      margin-bottom: 15px;
+    }
+
+    .cake {
+      font-size: 1.8rem;
+      margin: 0 10px;
+    }
+
+    #tanggal {
+      font-weight: 600;
+      font-size: 1rem;
+    }
+
+    #ucapan {
+      margin-top: 10px;
+      font-size: 0.95rem;
+      opacity: 0.9;
+    }
+
+    button {
+      margin-top: 30px;
+      background: linear-gradient(135deg, #ffcc00, #ff8800);
+      color: #000;
+      border: none;
+      border-radius: 30px;
+      padding: 14px 35px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 0 15px rgba(255, 200, 0, 0.5);
+      transition: all 0.3s ease;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 25px rgba(255, 200, 0, 0.8);
+    }
+
+    #kejutan {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.92);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      visibility: hidden;
+      opacity: 0;
+      transition: opacity 0.6s ease, visibility 0.6s ease;
+      z-index: 10;
+    }
+
+    #kejutan.show {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    #kejutan h2 {
+      font-family: 'Great Vibes', cursive;
+      color: #ffd700;
+      font-size: 2.3rem;
+      text-shadow: 0 0 15px #ffae00;
+      margin-bottom: 15px;
+    }
+
+    #kejutan p {
+      max-width: 600px;
+      color: #eee;
+      font-size: 1rem;
+      line-height: 1.5;
+      margin: 0 15px;
+      text-align: center;
+    }
+
+    #tutupKejutan {
+      margin-top: 30px;
+      background: linear-gradient(135deg, #ff4444, #cc0000);
+      color: #fff;
+      border: none;
+      border-radius: 25px;
+      padding: 12px 28px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      box-shadow: 0 0 15px rgba(255, 0, 0, 0.5);
+      transition: all 0.3s ease;
+    }
+
+    #tutupKejutan:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 25px rgba(255, 50, 50, 0.8);
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    audio {
+      display: none;
+    }
+
+    /* ==== FOTO KOTAK ==== */
+    .foto-kotak {
+      display: block;
+      width: 180px;
+      height: auto;
+      border-radius: 15px;
+      margin: 0 auto 15px auto;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+      z-index: 3;
+      position: relative;
+    }
+
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 2rem;
+      }
+
+      button {
+        padding: 12px 28px;
+        font-size: 0.9rem;
+      }
+
+      #kejutan h2 {
+        font-size: 1.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="loveCanvas"></canvas>
+
+  <!-- FOTO DI ATAS -->
+  <img src="1.jpg" alt="Foto Ulang Tahun" class="foto-kotak">
+
+  <h1>🎂 Selamat Datang di Perayaan Ulang Tahun 🎂</h1>
+  <div id="tanggal"></div>
+  <p id="ucapan">Hari ini adalah hari istimewa, di mana dunia terasa sedikit lebih indah karena kamu dilahirkan. 🌙</p>
+
+  <button id="btnKejutan">🎁 Lihat Kejutan</button>
+
+  <div id="kejutan">
+    <h2>💖 Selamat Ulang Tahun 💖</h2>
+    <p>Semoga kebahagiaan, cinta, dan keberuntungan selalu menyertaimu hari ini dan setiap hari ke depan.  
+      Dunia lebih bersinar karena kehadiranmu ✨</p>
+    <button id="tutupKejutan">✖ Tutup</button>
+  </div>
+
+  <audio id="musik" loop>
+    <source src="https://cdn.pixabay.com/audio/2022/03/15/audio_22e54a90f0.mp3" type="audio/mpeg">
+  </audio>
+
+  <script>
+    // === Tanggal Otomatis ===
+    const now = new Date();
+    const hariList = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+    const bulanList = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+    document.getElementById("tanggal").innerText =
+      `Hari ini ${hariList[now.getDay()]}, ${now.getDate()} ${bulanList[now.getMonth()]} ${now.getFullYear()}`;
+
+    // === Kejutan ===
+    const btn = document.getElementById("btnKejutan");
+    const kejutan = document.getElementById("kejutan");
+    const musik = document.getElementById("musik");
+    const tutup = document.getElementById("tutupKejutan");
+
+    btn.addEventListener("click", () => {
+      kejutan.classList.add("show");
+      musik.play();
+    });
+
+    tutup.addEventListener("click", () => {
+      kejutan.classList.remove("show");
+      musik.pause();
+      musik.currentTime = 0;
+    });
+
+    // === Efek partikel love ===
+    const canvas = document.getElementById("loveCanvas");
+    const ctx = canvas.getContext("2d");
+    let loves = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
+
+    class Love {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = canvas.height + Math.random() * 30 + 10;
+        this.size = Math.random() * 14 + 8;
+        this.speedY = Math.random() * 1.2 + 0.8;
+        this.startAlpha = Math.random() * 0.5 + 0.6;
+        this.alpha = this.startAlpha;
+        this.life = 0;
+      }
+      update() {
+        this.y -= this.speedY;
+        this.life += this.speedY;
+
+        const totalDistance = canvas.height + 100;
+        const traveled = canvas.height + 20 - this.y;
+        const progress = Math.min(Math.max(traveled / totalDistance, 0), 1);
+
+        const easeOut = (t) => 1 - Math.pow(1 - t, 2);
+        this.alpha = Math.max(0, this.startAlpha * (1 - easeOut(progress)));
+
+        if (this.y < -40 || this.alpha <= 0.01) this.dead = true;
+      }
+      draw() {
+        ctx.save();
+        ctx.globalAlpha = this.alpha;
+        ctx.font = `${this.size}px serif`;
+        ctx.fillText("💖", this.x, this.y);
+        ctx.restore();
+      }
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      if (Math.random() < 0.06) loves.push(new Love());
+      for (let i = loves.length - 1; i >= 0; i--) {
+        loves[i].update();
+        loves[i].draw();
+        if (loves[i].dead) loves.splice(i, 1);
+      }
+      requestAnimationFrame(animate);
+    }
+    animate();
+  </script>
+</body>
+</html>
